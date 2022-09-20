@@ -1,5 +1,8 @@
 #!/bin/bash
 #Licensed under the ISC license.
+
+
+
 VERSION="0.1"
 
 __piutmp() {
@@ -83,7 +86,7 @@ UPDATE_AFTER=43200 # 12 hours
 
 usage() {
 cat <<HELP
-Cross-platform package manager wrapper
+package manager wrapper for PlayNux
 
 usage: $(basename "$0") OPTION [--cask] [PACKAGE]
 
@@ -98,7 +101,7 @@ usage: $(basename "$0") OPTION [--cask] [PACKAGE]
    UPDATING
    (u)pdate  : update all installed packages
    (c)ache   : update the package cache / repository
-
+   -U        : Update the utility
                NOTE: update, install, and num-updates will automatically
                update the cache if it is old
 

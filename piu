@@ -1,9 +1,6 @@
 #!/bin/bash
-
-#Cross-platform package manager wrapper
-#https://github.com/keithieopia/piu
-#Copyright (c) 2017-2021 Timothy Keith
 #Licensed under the ISC license.
+VERSION="0.1"
 
 __piutmp() {
 	# Piu Temp Directory Manager
@@ -20,6 +17,22 @@ __piutmp() {
 	esac
 }
 
+while getopts 'Uda:' OPTION; do
+  case "$OPTION" in
+    U)
+      update_script()
+      ;;
+    d)
+      update_script()
+      ;;
+    a)
+      update_script()
+      ;;
+      exit 1
+      ;;
+  esac
+done
+
 __piuplm () {
 	# Piu PID Lock Manager
 	case ${1} in
@@ -34,6 +47,21 @@ __piuplm () {
 			__piutmp restart
 		;;
 	esac
+}
+
+update_script () {
+	update="$(curl -A "$agent" -s "https://raw.githubusercontent.com/Dumbo-programmer/piu/master/piu")" || die "Connection error"
+	update="$(printf '%s\n' "$update" | diff -u "$0" -)"
+	if [ -z "$update" ]; then
+		inf "Script is up to date :)"
+	else
+		if printf '%s\n' "$update" | patch "$0" - ; then
+			inf "Script has been updated"
+		else
+			die "Can't update for some reason!"
+		fi
+	fi
+	exit 0
 }
 
 bye() {
@@ -79,10 +107,8 @@ usage: $(basename "$0") OPTION [--cask] [PACKAGE]
    (nu) num-updates  : number of packages with updates
    (np) num-packages : number of installed packages
 
-https://github.com/keithieopia/piu
 
-Copyright (c) 2017-2021 Timothy Keith
-Licensed under the ISC license.
+
 HELP
 }
 
@@ -90,14 +116,7 @@ HELP
 ########################################################################
 not_implemented() { echo "'${FUNCNAME[1]}' not implemented yet!" && exit 1; }
 
-# Distro Specific
-########################################################################
-#
-# Alpine Linux
-#
-# WONTFIX:
-# piu depends on bash, which isn't in the base install of Alpine.
-# Without it, the following error occurs: "-ash: piu: not found"
+
 apk_install() { sudo apk add "$@"; }
 apk_update()  { sudo apk upgrade; }
 apk_remove()  { sudo apk del "$@"; }
@@ -129,17 +148,7 @@ pacman_remove()  { sudo pacman -Rs "$@"; }
 pacman_purge()   { sudo pacman -Rns "$@"; }
 pacman_search()  { pacman -Ss "$@"; }
 pacman_list()    { pacman -Qqe; }
-pacman_list_files() {
-	# HELPWANTED:
-	# The below code will fail on similar named packages
-	# like chromium and chromium-bsu. The problem is two-fold
-	#
-	# 1. pacman searching needs to use ^PACKAGE$ to match
-	# exact names. `pacman -Qs $$@^` doesn't work, but how to
-	# properly escape is beyond me.
-	#
-	# 2. Output from `pacman -Sw` should be captured to get the
-	# exact filename of the package. Calling `ls` is sloppy
+pacman_list_files(){
 
 	if ! pacman -Qs "$@" >/dev/null; then
 		sudo pacman -Sw --noconfirm "$@"

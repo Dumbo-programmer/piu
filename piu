@@ -23,16 +23,13 @@ __piutmp() {
 while getopts 'Uda:' OPTION; do
   case "$OPTION" in
     U)
-      update_script()
-      ;;
+      update_script;;
     d)
-      update_script()
-      ;;
+      update_script;;
     a)
-      update_script()
-      ;;
-      exit 1
-      ;;
+      update_script;;
+      
+     
   esac
 done
 
